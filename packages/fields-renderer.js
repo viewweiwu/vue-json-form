@@ -1,10 +1,10 @@
 import TagGenerator from './tag-generator'
+import { install } from './platform-element'
+import { isUndefined } from './util'
 
 const tg = new TagGenerator()
 
-tg.registerTag({ tagName: 'el-input', type: 'input', defaultValue: '' })
-tg.registerTag({ tagName: 'el-input-number', type: 'input-number', defaultValue: '' })
-
+install(tg)
 
 /**
  * init form default value
@@ -13,7 +13,7 @@ tg.registerTag({ tagName: 'el-input-number', type: 'input-number', defaultValue:
  */
 export const initDefaultValue = function ({ fields, form }) {
   fields.forEach(field => {
-    if (form[field.key] === undefined) {
+    if (isUndefined(form[field.key])) {
       this.$set(form, field.key, tg.getDefaultValue(field.type))
     }
   })
@@ -64,6 +64,6 @@ const renderFormItem = (h, { field, form }) => {
       prop: field.key
     }
   }
-  tag = h(tg.getTag(type), tg.getRenderItem.call(this, h, { field, form}))
+  tag = tg.renderTag(h, { field, form} )
   return h(tg.getTag('form-item'), options, [ tag ])
 }
