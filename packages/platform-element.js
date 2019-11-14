@@ -1,21 +1,104 @@
-export const install = (tg) => {
-  tg.registerTag({ tagName: 'el-input', type: 'input', defaultValue: '' })
-  tg.registerTag({ tagName: 'el-input-number', type: 'input-number', defaultValue: null })
-  tg.registerTag({ tagName: 'el-switch', type: 'switch', defaultValue: false })
-  tg.registerTag({ tagName: 'el-slider', type: 'slider', defaultValue: null })
-  tg.registerTag({ tagName: 'el-rate', type: 'rate', defaultValue: null })
-  tg.registerTag({ tagName: 'el-time-select', type: 'time-select', defaultValue: '' })
-  tg.registerTag({ tagName: 'el-time-picker', type: 'time-picker', defaultValue: '' })
-  tg.registerTag({ tagName: 'el-date-picker', type: 'date-picker', defaultValue: '' })
-  tg.registerTag({ tagName: 'el-color-picker', type: 'color-picker', defaultValue: '' })
-  tg.registerTag({ tagName: 'el-date-picker', type: 'date-range', defaultValue: [], defaultProps: { type: 'daterange' } })
-  tg.registerTag({ tagName: 'el-date-picker', type: 'datetime-range', defaultValue: [], defaultProps: { type: 'datetimerange' } })
-  tg.registerTag({
+import { formatTime, formatDate, formatFullDateTime, formatDateRangeText } from './util'
+
+export const install = (fg) => {
+  // register form
+  fg.registerForm({
+    render (h, { fields, form, renderFields }) {
+      let options = {
+        class: 'vue-json-form',
+        props: {
+          'label-width': '120px'
+        }
+      }
+      let children = renderFields(h, { fields, form })
+      return h('el-form', options, children)
+    }
+  })
+
+  // register form-item
+  fg.registerFormItem({
+    render (h, { field, form }) {
+      let options = {
+        props: {
+          label: field.title,
+          prop: field.key
+        }
+      }
+      let tag = this.renderField(h, { field, form} )
+      return h('el-form-item', options, [ tag ])
+    }
+  })
+
+  // register input
+  fg.registerField({ tagName: 'el-input', type: 'input', defaultValue: '' })
+
+  // register input-number
+  fg.registerField({ tagName: 'el-input-number', type: 'input-number', defaultValue: null })
+
+  // register switch
+  fg.registerField({ tagName: 'el-switch', type: 'switch', defaultValue: false, readonlyType: 'disabled' })
+
+  // register slider
+  fg.registerField({ tagName: 'el-slider', type: 'slider', defaultValue: null })
+
+  // register rate
+  fg.registerField({ tagName: 'el-rate', type: 'rate', defaultValue: null, readonlyType: 'disabled' })
+
+  // register time-select
+  fg.registerField({ tagName: 'el-time-select', type: 'time-select', defaultValue: '' })
+
+  // register time-picker
+  fg.registerField({
+    tagName: 'el-time-picker',
+    type: 'time-picker',
+    defaultValue: '',
+    renderReadonly (h, { field, form, emptyText }) {
+      return h('div', { class: 'form-readonly-text' }, formatTime(form[field.key]) || emptyText)
+    }
+  })
+
+  // register date-picker
+  fg.registerField({
+    tagName: 'el-date-picker',
+    type: 'date-picker',
+    defaultValue: '',
+    renderReadonly (h, { field, form, emptyText}) {
+      return h('div', { class: 'form-readonly-text' }, formatDate(form[field.key]) || emptyText)
+    }
+  })
+
+  // register color-picker
+  fg.registerField({ tagName: 'el-color-picker', type: 'color-picker', defaultValue: '' })
+
+  // register time-select
+  fg.registerField({
+    tagName: 'el-date-picker',
+    type: 'date-range',
+    defaultValue: [],
+    defaultProps: { type: 'daterange' },
+    renderReadonly (h, { field, form, emptyText }) {
+      return h('div', { class: 'form-readonly-text' }, formatDateRangeText(form[field.key], formatDate, emptyText))
+    }
+  })
+
+  // register datetime-range
+  fg.registerField({
+    tagName: 'el-date-picker',
+    type: 'datetime-range',
+    defaultValue: [],
+    defaultProps: { type: 'datetimerange' },
+    renderReadonly (h, { field, form, emptyText }) {
+      return h('div', { class: 'form-readonly-text' }, formatDateRangeText(form[field.key], formatFullDateTime, emptyText))
+    }
+  })
+
+  // register select
+  fg.registerField({
     tagName: 'el-select',
     type: 'select',
     defaultValue: null,
     render (h, { field, form }) {
-      let options = field.options
+      let options = field.options || []
       let optionsTag = options.map(option => {
         return h('el-option', {
           props: {
@@ -26,21 +109,32 @@ export const install = (tg) => {
         }, option.label)
       })
       return h(this.getTag('select'), this.getOptions(h, { field, form }), optionsTag)
+    },
+    renderReadonly (h, { field, form, emptyText }) {
+      let options = field.options
+      let option = options.find(option => option.value === form[field.key])
+      return h('div', { class: 'form-readonly-text' }, option ? option.label : emptyText )
     }
   })
-  tg.registerTag({
+
+  // register checkbox
+  fg.registerField({
     tagName: 'el-checkbox',
     type: 'checkbox',
     defaultValue: false,
-    render (h, { field, form }) {
-      return h(this.getTag('checkbox'), this.getOptions(h, { field, form }), field.label)
+    readonlyType: 'disabled',
+    render (h, { field, form, props }) {
+      return h(this.getTag('checkbox'), this.getOptions(h, { field, form, props }), field.label)
     }
   })
-  tg.registerTag({
+
+  // register checkbox
+  fg.registerField({
     tagName: 'el-checkbox-group',
     type: 'checkbox-group',
     defaultValue: [],
-    render (h, { field, form }) {
+    readonlyType: 'disabled',
+    render (h, { field, form, props }) {
       let options = field.options
       let optionsTag = options.map(option => {
         return h('el-checkbox', {
@@ -50,22 +144,28 @@ export const install = (tg) => {
           }
         }, option.label)
       })
-      return h(this.getTag('checkbox-group'), this.getOptions(h, { field, form }), optionsTag)
+      return h(this.getTag('checkbox-group'), this.getOptions(h, { field, form, props }), optionsTag)
     }
   })
-  tg.registerTag({
+
+  // register radio
+  fg.registerField({
     tagName: 'el-radio',
     type: 'radio',
     defaultValue: false,
-    render (h, { field, form }) {
-      return h(this.getTag('radio'), this.getOptions(h, { field, form }), field.label)
+    readonlyType: 'disabled',
+    render (h, { field, form, props }) {
+      return h(this.getTag('radio'), this.getOptions(h, { field, form, props }), field.label)
     }
   })
-  tg.registerTag({
+
+  // register radio-group
+  fg.registerField({
     tagName: 'el-radio-group',
     type: 'radio-group',
     defaultValue: [],
-    render (h, { field, form }) {
+    readonlyType: 'disabled',
+    render (h, { field, form, props }) {
       let options = field.options
       let optionsTag = options.map(option => {
         return h('el-radio', {
@@ -75,16 +175,21 @@ export const install = (tg) => {
           }
         }, option.label)
       })
-      return h(this.getTag('radio-group'), this.getOptions(h, { field, form }), optionsTag)
+      return h(this.getTag('radio-group'), this.getOptions(h, { field, form, props }), optionsTag)
     }
   })
-  tg.registerTag({
+  
+  // register cascader
+  fg.registerField({
     tagName: 'el-cascader',
     type: 'cascader',
     defaultValue: [],
-    render (h, { field, form }) {
-      field.props ? field.props.options = field.options : field.props = { options: field.options }
-      return h(this.getTag('cascader'), this.getOptions(h, { field, form }))
+    readonlyType: 'disabled',
+    render (h, { field, form, props }) {
+      field.props ?
+        field.props.options = field.options :
+        field.props = { options: field.options }
+      return h(this.getTag('cascader'), this.getOptions(h, { field, form, props }))
     }
   })
 }

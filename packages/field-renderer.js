@@ -1,10 +1,10 @@
-import TagGenerator from './tag-generator'
+import FieldGenerator from './field-generator'
 import { install } from './platform-element'
 import { isUndefined } from './util'
 
-const tg = new TagGenerator()
+const fg = new FieldGenerator()
 
-install(tg)
+install(fg)
 
 /**
  * init form default value
@@ -14,7 +14,7 @@ install(tg)
 export const initDefaultValue = function ({ fields, form }) {
   fields.forEach(field => {
     if (isUndefined(form[field.key])) {
-      this.$set(form, field.key, tg.getDefaultValue(field.type))
+      this.$set(form, field.key, fg.getDefaultValue(field.type))
     }
   })
 }
@@ -25,12 +25,8 @@ export const initDefaultValue = function ({ fields, form }) {
  * @param {Array} fields
  * @param {Object} form
  */
-export const renderForm = (h, { fields, form }) => {
-  let options = {
-    class: 'vue-json-form'
-  }
-  let children = renderFields(h, { fields, form })
-  return h(tg.getTag('form'), options, children)
+export const renderForm = (h, { fields, form, readonly, emptyText }) => {
+  return fg.renderForm(h, { fields, form, renderFields, readonly, emptyText })
 }
 
 /**
@@ -56,14 +52,5 @@ const renderFields= (h, { fields, form }) => {
  * @param {Object} form
  */
 const renderFormItem = (h, { field, form }) => {
-  let tag = ''
-  let type = field.type
-  let options = {
-    props: {
-      label: field.title,
-      prop: field.key
-    }
-  }
-  tag = tg.renderTag(h, { field, form} )
-  return h(tg.getTag('form-item'), options, [ tag ])
+  return fg.renderFormItem(h, { field, form })
 }

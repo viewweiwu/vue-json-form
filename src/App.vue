@@ -1,6 +1,7 @@
 <template>
   <div>
-    <vue-json-form :fields="fields" :form="form" />
+    <el-button @click="readonly = !readonly">readonly</el-button>
+    <vue-json-form :fields="fields" :form="form" :readonly="readonly" />
   </div>
 </template>
 <script>
@@ -9,6 +10,7 @@ export default {
   name: 'app',
   data () {
     return {
+      readonly: false,
       form: {},
       fields: [
         {
@@ -134,5 +136,14 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+.form-readonly-text {
+  min-height: 40px;
+  line-height: 1em;
+  padding: 12px 15px;
+  border-radius: 4px;
+  border: 1px solid #ebeef5;
+  background-color: #ebeef5;
+  box-sizing: border-box;
 }
 </style>

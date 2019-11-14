@@ -1,5 +1,4 @@
-
-import { renderForm, initDefaultValue } from './fields-renderer'
+import { renderForm, initDefaultValue } from './field-renderer'
 
 export default {
   name: 'vue-json-form',
@@ -11,11 +10,22 @@ export default {
     fields: {
       type: Array,
       default: () => []
+    },
+    readonly: {
+      type: Boolean,
+      default: false
+    },
+    emptyText: {
+      type: String,
+      default: '-'
     }
   },
   render (h) {
-    let { fields, form } = this
-    return renderForm(h, { fields, form })
+    let { fields, form, readonly, emptyText } = this
+    let config = {
+      readonly
+    }
+    return renderForm(h, { fields, form, readonly, emptyText })
   },
   created () {
     this.init()
