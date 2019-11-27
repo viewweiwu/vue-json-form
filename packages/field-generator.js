@@ -8,6 +8,11 @@ class FieldGenerator {
     this.readonly = false
     this.emptyText = '-'
   }
+  /**
+   * get form item tag name
+   * @param {String} name
+   * @returns {String} input -> el-input
+   */
   getTag (name) {
     let field = 'div'
     let target = FIELDS_MAP[name]
@@ -16,6 +21,14 @@ class FieldGenerator {
     }
     return field
   }
+  /**
+   * get form item render function
+   * @param {Function} h $createElement
+   * @param {Object} field
+   * @param {Object} form
+   * @param {Object} target field config
+   * @returns {Function} render function
+   */
   getRender (h, { field, form, target }) {
     let { readonly } = this
     if (target) {
@@ -27,6 +40,14 @@ class FieldGenerator {
       }
     }
   }
+  /**
+   * get form item readonly mode render function
+   * @param {Function} h $createElement
+   * @param {Object} field
+   * @param {Object} form
+   * @param {Object} target field config
+   * @returns {Function} readonly render function
+   */
   _getReadonly (h, { field, form, target }) {
     let { emptyText } = this
     if (isFunc(target.renderReadonly)) {
@@ -42,6 +63,14 @@ class FieldGenerator {
       return h('div', { class: 'form-readonly-text' }, form[field.key] || emptyText )
     }
   }
+  /**
+   * get form item render function
+   * @param {Function} h $createElement
+   * @param {Object} field
+   * @param {Object} form
+   * @param {Object} props field props
+   * @returns {Object} render function options object
+   */
   getOptions (h, { field, form, props }) {
     let defaultProps = FIELDS_MAP[field.type].defaultProps
     let totalProps = {
@@ -71,6 +100,11 @@ class FieldGenerator {
       }
     }
   }
+  /**
+   * get form item default value
+   * @param {String} key filed key
+   * @returns {Any} field default value
+   */
   getDefaultValue (key) {
     let target = FIELDS_MAP[key]
     let defaultValue = null
@@ -86,6 +120,11 @@ class FieldGenerator {
       return defaultValue
     }
   }
+  /**
+   * get form item default value
+   * @param {String} key filed key
+   * @returns {Any} field default value
+   */
   renderField (h, { field, form }) {
     let render = this.getRender(h, { field, form, target: FIELDS_MAP[field.type] })
     if (render) {
@@ -94,13 +133,29 @@ class FieldGenerator {
       return h(this.getTag(field.type), this.getOptions(h, { field, form }))
     }
   }
+  /**
+   * render form item
+   * @param {Function} h $createElement
+   * @param {Object} field
+   * @param {Object} form
+   * @returns {Function} form item render function
+   */
   renderFormItem (h, { field, form }) {
     let target = FORM_MAP['form-item']
     if (target && target.render) {
       return target.render.call(this, h, { field, form })
     }
-    // return this.getRender(h, { field, form, target: FORM_MAP['form-item'] })
   }
+  /**
+   * render form
+   * @param {Function} h $createElement
+   * @param {Object} field
+   * @param {Object} form
+   * @param {Array<Object:Field>} renderFields
+   * @param {Boolean} readonly
+   * @param {String} emptyText
+   * @returns {Function} form render function
+   */
   renderForm (h, { fields, form, renderFields, readonly, emptyText }) {
     this.readonly = readonly
     this.emptyText = emptyText
@@ -109,12 +164,27 @@ class FieldGenerator {
       return target.render.call(this, h, { fields, form, renderFields })
     }
   }
+  /**
+   * register field
+   * @param {Object} options
+   * @returns {Object} options
+   */
   registerField (options) {
     return FIELDS_MAP[options.type] = options
   }
+  /**
+   * register form item
+   * @param {Object} options
+   * @returns {Object} options
+   */
   registerFormItem (options) {
     return FORM_MAP['form-item'] = options
   }
+  /**
+   * register form
+   * @param {Object} options
+   * @returns {Object} options
+   */
   registerForm (options) {
     return FORM_MAP['form'] = options
   }
