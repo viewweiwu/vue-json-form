@@ -18,14 +18,18 @@ export default {
     emptyText: {
       type: String,
       default: '-'
+    },
+    autoInitPlaceholder: {
+      type: Boolean,
+      default: true
     }
   },
   render (h) {
-    let { fields, form, readonly, emptyText } = this
+    let { fields, form, readonly, emptyText, autoInitPlaceholder } = this
     let config = {
       readonly
     }
-    return renderForm(h, { fields, form, readonly, emptyText })
+    return renderForm(h, { fields, form, readonly, emptyText, autoInitPlaceholder })
   },
   created () {
     this.init()

@@ -30,7 +30,7 @@ export const install = (fg) => {
   })
 
   // register input
-  fg.registerField({ tagName: 'el-input', type: 'input', defaultValue: '' })
+  fg.registerField({ tagName: 'el-input', type: 'input', defaultValue: '', defaultProps: { placeholder: `请输入@title` } })
 
   // register input-number
   fg.registerField({ tagName: 'el-input-number', type: 'input-number', defaultValue: null })
@@ -45,13 +45,14 @@ export const install = (fg) => {
   fg.registerField({ tagName: 'el-rate', type: 'rate', defaultValue: null, readonlyType: 'disabled' })
 
   // register time-select
-  fg.registerField({ tagName: 'el-time-select', type: 'time-select', defaultValue: '' })
+  fg.registerField({ tagName: 'el-time-select', type: 'time-select', defaultValue: '', defaultProps: { placeholder: `请选择@title` } })
 
   // register time-picker
   fg.registerField({
     tagName: 'el-time-picker',
     type: 'time-picker',
     defaultValue: '',
+    defaultProps: { placeholder: `请选择@title` },
     renderReadonly (h, { field, form, emptyText }) {
       return h('div', { class: 'form-readonly-text' }, formatTime(form[field.key]) || emptyText)
     }
@@ -62,6 +63,7 @@ export const install = (fg) => {
     tagName: 'el-date-picker',
     type: 'date-picker',
     defaultValue: '',
+    defaultProps: { placeholder: `请选择@title` },
     renderReadonly (h, { field, form, emptyText}) {
       return h('div', { class: 'form-readonly-text' }, formatDate(form[field.key]) || emptyText)
     }
@@ -75,7 +77,7 @@ export const install = (fg) => {
     tagName: 'el-date-picker',
     type: 'date-range',
     defaultValue: [],
-    defaultProps: { type: 'daterange' },
+    defaultProps: { type: 'daterange', 'start-placeholder': '开始日期', 'end-placeholder': '结束日期' },
     renderReadonly (h, { field, form, emptyText }) {
       return h('div', { class: 'form-readonly-text' }, formatDateRangeText(form[field.key], formatDate, emptyText))
     }
@@ -86,7 +88,7 @@ export const install = (fg) => {
     tagName: 'el-date-picker',
     type: 'datetime-range',
     defaultValue: [],
-    defaultProps: { type: 'datetimerange' },
+    defaultProps: { type: 'datetimerange', 'start-placeholder': '开始日期', 'end-placeholder': '结束日期' },
     renderReadonly (h, { field, form, emptyText }) {
       return h('div', { class: 'form-readonly-text' }, formatDateRangeText(form[field.key], formatFullDateTime, emptyText))
     }
@@ -97,6 +99,7 @@ export const install = (fg) => {
     tagName: 'el-select',
     type: 'select',
     defaultValue: null,
+    defaultProps: { placeholder: `请选择@title` },
     render (h, { field, form }) {
       let options = field.options || []
       let optionsTag = options.map(option => {
@@ -185,6 +188,7 @@ export const install = (fg) => {
     type: 'cascader',
     defaultValue: [],
     readonlyType: 'disabled',
+    defaultProps: { placeholder: `请选择@title` },
     render (h, { field, form, props }) {
       field.props ?
         field.props.options = field.options :

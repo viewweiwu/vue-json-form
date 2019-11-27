@@ -32,13 +32,11 @@ class FieldGenerator {
     if (isFunc(target.renderReadonly)) {
       return target.renderReadonly.call(this, h, { field, form, emptyText })
     } else if (target.readonlyType === 'disabled') {
+      let props = { disabled: true }
       if (isFunc(target.render)) {
-        let props = {
-          disabled: true
-        }
         return target.render.call(this, h, { field, form, readonly: this.readonly, props, emptyText })
       } else {
-        return h(this.getTag(field.type), this.getOptions(h, { field, form }))
+        return h(this.getTag(field.type), this.getOptions(h, { field, form, props }))
       }
     } else {
       return h('div', { class: 'form-readonly-text' }, form[field.key] || emptyText )
@@ -52,10 +50,17 @@ class FieldGenerator {
       ...field.props,
       ...props
     }
+    let placeholder = totalProps.placeholder || ''
+    placeholder = placeholder.replace(/@title/g, field.title)
+    totalProps.placeholder = placeholder
+    let totalAttrs = {
+      placeholder: totalProps.placeholder,
+      ...field.attrs
+    }
     return {
       key: form.key,
       props: totalProps,
-      attrs: field.attrs,
+      attrs: totalAttrs,
       on: {
         input (value) {
           form[field.key] = value

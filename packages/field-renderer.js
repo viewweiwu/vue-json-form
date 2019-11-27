@@ -25,8 +25,8 @@ export const initDefaultValue = function ({ fields, form }) {
  * @param {Array} fields
  * @param {Object} form
  */
-export const renderForm = (h, { fields, form, readonly, emptyText }) => {
-  return fg.renderForm(h, { fields, form, renderFields, readonly, emptyText })
+export const renderForm = (h, { fields, form, readonly, emptyText, autoInitPlaceholder }) => {
+  return fg.renderForm(h, { fields, form, renderFields, readonly, emptyText, autoInitPlaceholder })
 }
 
 /**
