@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 
 /**
  * is Object
- * @param {Object} obj 
+ * @param {Object} obj
  */
 export const isObj = (obj) => {
   return Object.prototype.toString.call(obj) === '[object Object]'
@@ -10,7 +10,7 @@ export const isObj = (obj) => {
 
 /**
  * is Function
- * @param {Function} func 
+ * @param {Function} func
  */
 export const isFunc = (func) => {
   return typeof func === 'function'
@@ -18,7 +18,7 @@ export const isFunc = (func) => {
 
 /**
  * is undefiend
- * @param {undefined} value 
+ * @param {undefined} value
  */
 export const isUndefined = (value) => {
   return typeof value === 'undefined'
@@ -26,7 +26,7 @@ export const isUndefined = (value) => {
 
 /**
  * copy data
- * @param {Object} data 
+ * @param {Object} data
  */
 export const copy = (data) => {
   return JSON.parse(JSON.stringify(data))
@@ -34,13 +34,13 @@ export const copy = (data) => {
 
 /**
  * format date
- * @param {Date} value 
- * @param {String} format 
+ * @param {Date} value
+ * @param {String} format
  */
 export const formatDate = (value, format = 'YYYY-MM-DD') => {
   if (value) {
-      let date = new Date(value)
-      return dayjs(date).format(format)
+    let date = new Date(value)
+    return dayjs(date).format(format)
   } else {
     return ''
   }
@@ -48,8 +48,8 @@ export const formatDate = (value, format = 'YYYY-MM-DD') => {
 
 /**
  * format date
- * @param {Date} value 
- * @param {String} format 
+ * @param {Date} value
+ * @param {String} format
  */
 export const formatTime = (value, format = 'HH:mm:ss') => {
   return formatDate(value, format)
@@ -57,8 +57,8 @@ export const formatTime = (value, format = 'HH:mm:ss') => {
 
 /**
  * format date
- * @param {Date} value 
- * @param {String} format 
+ * @param {Date} value
+ * @param {String} format
  */
 export const formatDateTime = (value, format = 'YYYY-MM-DD HH:mm') => {
   return formatDate(value, format)
@@ -66,8 +66,8 @@ export const formatDateTime = (value, format = 'YYYY-MM-DD HH:mm') => {
 
 /**
  * format date
- * @param {Date} value 
- * @param {String} format 
+ * @param {Date} value
+ * @param {String} format
  */
 export const formatFullDateTime = (value, format = 'YYYY-MM-DD HH:mm:ss') => {
   return formatDate(value, format)

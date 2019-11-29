@@ -1,4 +1,4 @@
-import { isFunc,  isObj, copy, isUndefined } from './util'
+import { isFunc, isObj, copy, isUndefined } from './util'
 
 let FIELDS_MAP = {}
 let FORM_MAP = {}
@@ -30,13 +30,13 @@ class FieldGenerator {
    * @returns {Function} render function
    */
   getRender (h, { field, form, target }) {
-    let { readonly } = this
+    let { readonly, context } = this
     if (target) {
       // is readonly
-      if (readonly) {
-        return this._getReadonly(h, { field, form, target })
+      if (readonly || field.readonly) {
+        return this._getReadonly(h, { field, form, target, context })
       } else if (isFunc(target.render)) {
-        return target.render.call(this, h, { field, form, readonly })
+        return target.render.call(this, h, { field, form, readonly, context })
       }
     }
   }
@@ -49,18 +49,18 @@ class FieldGenerator {
    * @returns {Function} readonly render function
    */
   _getReadonly (h, { field, form, target }) {
-    let { emptyText } = this
+    let { emptyText, context } = this
     if (isFunc(target.renderReadonly)) {
-      return target.renderReadonly.call(this, h, { field, form, emptyText })
+      return target.renderReadonly.call(this, h, { field, form, emptyText, context })
     } else if (target.readonlyType === 'disabled') {
       let props = { disabled: true }
       if (isFunc(target.render)) {
-        return target.render.call(this, h, { field, form, readonly: this.readonly, props, emptyText })
+        return target.render.call(this, h, { field, form, readonly: this.readonly, props, emptyText, context })
       } else {
-        return h(this.getTag(field.type), this.getOptions(h, { field, form, props }))
+        return h(this.getTag(field.type), this.getOptions(h, { field, form, props, context }))
       }
     } else {
-      return h('div', { class: 'form-readonly-text' }, form[field.key] || emptyText )
+      return h('div', { class: 'form-readonly-text' }, form[field.key] || emptyText)
     }
   }
   /**
@@ -75,9 +75,9 @@ class FieldGenerator {
     let defaultProps = FIELDS_MAP[field.type].defaultProps
     let totalProps = {
       ...defaultProps,
-      value: form[field.key],
       ...field.props,
-      ...props
+      ...props,
+      value: form[field.key]
     }
     let placeholder = totalProps.placeholder || ''
     placeholder = placeholder.replace(/@title/g, field.title)
@@ -103,9 +103,13 @@ class FieldGenerator {
   /**
    * get form item default value
    * @param {String} key filed key
+   * @param {Object} field filed
    * @returns {Any} field default value
    */
-  getDefaultValue (key) {
+  getDefaultValue (key, field) {
+    if (!isUndefined(field.defaultValue)) {
+      return field.defaultValue
+    }
     let target = FIELDS_MAP[key]
     let defaultValue = null
     if (target) {
@@ -120,17 +124,21 @@ class FieldGenerator {
       return defaultValue
     }
   }
+  getConfigByFiledType (key) {
+    return FIELDS_MAP[key]
+  }
   /**
    * get form item default value
    * @param {String} key filed key
    * @returns {Any} field default value
    */
   renderField (h, { field, form }) {
-    let render = this.getRender(h, { field, form, target: FIELDS_MAP[field.type] })
+    let context = this.context
+    let render = this.getRender(h, { field, form, context, target: FIELDS_MAP[field.type] })
     if (render) {
       return render
     } else {
-      return h(this.getTag(field.type), this.getOptions(h, { field, form }))
+      return h(this.getTag(field.type), this.getOptions(h, { field, form, context }))
     }
   }
   /**
@@ -141,9 +149,10 @@ class FieldGenerator {
    * @returns {Function} form item render function
    */
   renderFormItem (h, { field, form }) {
+    let context = this.context
     let target = FORM_MAP['form-item']
     if (target && target.render) {
-      return target.render.call(this, h, { field, form })
+      return target.render.call(this, h, { field, form, context })
     }
   }
   /**
@@ -154,39 +163,38 @@ class FieldGenerator {
    * @param {Array<Object:Field>} renderFields
    * @param {Boolean} readonly
    * @param {String} emptyText
+   * @param {Object} context vue-json-form context
    * @returns {Function} form render function
    */
-  renderForm (h, { fields, form, renderFields, readonly, emptyText }) {
+  renderForm (h, { fields, form, renderFields, readonly, emptyText, context }) {
     this.readonly = readonly
     this.emptyText = emptyText
+    this.context = context
     let target = FORM_MAP['form']
     if (target && target.render) {
-      return target.render.call(this, h, { fields, form, renderFields })
+      return target.render.call(this, h, { fields, form, renderFields, context })
     }
   }
   /**
    * register field
    * @param {Object} options
-   * @returns {Object} options
    */
   registerField (options) {
-    return FIELDS_MAP[options.type] = options
+    FIELDS_MAP[options.type] = options
   }
   /**
    * register form item
    * @param {Object} options
-   * @returns {Object} options
    */
   registerFormItem (options) {
-    return FORM_MAP['form-item'] = options
+    FORM_MAP['form-item'] = options
   }
   /**
    * register form
    * @param {Object} options
-   * @returns {Object} options
    */
   registerForm (options) {
-    return FORM_MAP['form'] = options
+    FORM_MAP['form'] = options
   }
 }
 

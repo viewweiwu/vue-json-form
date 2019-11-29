@@ -1,3 +1,4 @@
+<script>
 import { renderForm, initDefaultValue } from './field-renderer'
 
 export default {
@@ -26,10 +27,7 @@ export default {
   },
   render (h) {
     let { fields, form, readonly, emptyText, autoInitPlaceholder } = this
-    let config = {
-      readonly
-    }
-    return renderForm(h, { fields, form, readonly, emptyText, autoInitPlaceholder })
+    return renderForm(h, { fields, form, readonly, emptyText, autoInitPlaceholder, context: this })
   },
   created () {
     this.init()
@@ -38,6 +36,11 @@ export default {
     init () {
       let { fields, form } = this
       initDefaultValue.call(this, { fields, form })
+    },
+    clear () {
+      this.$refs.form.clearValidate()
     }
   }
 }
+
+</script>

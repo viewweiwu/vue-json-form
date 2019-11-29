@@ -2,46 +2,56 @@
   <div>
     <el-button @click="readonly = !readonly">readonly</el-button>
     <vue-json-form :fields="fields" :form="form" :readonly="readonly" />
+    <vue-json-form :fields="fields" :form="form" :readonly="readonly" />
   </div>
 </template>
 <script>
-
 export default {
   name: 'app',
   data () {
     return {
       readonly: false,
-      form: {},
+      form: {
+        name: '',
+        name2: ''
+      },
       fields: [
         {
-          title: '输入框',
+          title: '姓名',
           type: 'input',
-          key: 'name'
+          key: 'name',
+          defaultValue: '3333',
+          required: true
         },
         {
-          title: '数字输入框',
+          title: '身高',
           type: 'input-number',
-          key: 'age'
+          key: 'age',
+          required: true
         },
         {
-          title: '开关',
+          title: '是否成年',
           type: 'switch',
-          key: 'switchKey'
+          key: 'switchKey',
+          required: true
         },
         {
-          title: '滑块',
+          title: '年龄',
           type: 'slider',
-          key: 'sliderKey'
+          key: 'sliderKey',
+          required: true
         },
         {
           title: '评分',
           type: 'rate',
-          key: 'rateKey'
+          key: 'rateKey',
+          required: true
         },
         {
           title: '选择',
           type: 'select',
           key: 'selectKey',
+          required: true,
           options: [
             { label: '标签1', value: 0 }
           ]
@@ -50,12 +60,14 @@ export default {
           title: '多选框',
           type: 'checkbox',
           key: 'checkboxKey',
-          label: '是否同意'
+          label: '是否同意',
+          required: true
         },
         {
           title: '多选框组',
           type: 'checkbox-group',
           key: 'checkboxGroupKey',
+          required: true,
           options: [
             { label: '标签1', value: 0 },
             { label: '标签2', value: 1 }
@@ -65,13 +77,15 @@ export default {
           title: '单选框',
           type: 'radio',
           key: 'radioKey',
-          label: '是否同意'
+          label: '是否同意',
+          required: true
         },
         {
 
           title: '单选框组',
           type: 'radio-group',
           key: 'radioGroupKey',
+          required: true,
           options: [
             { label: '标签1', value: 0 },
             { label: '标签2', value: 1 }
@@ -81,6 +95,7 @@ export default {
           title: '级连选择',
           type: 'cascader',
           key: 'cascaderKey',
+          required: true,
           options: [
             { label: '北京', value: 0 },
             {
@@ -95,35 +110,49 @@ export default {
         {
           title: '时间选择',
           type: 'time-select',
-          key: 'timeSelectKey'
+          key: 'timeSelectKey',
+          required: true
         },
         {
           title: '时间选择',
           type: 'time-picker',
-          key: 'timePickerKey'
+          key: 'timePickerKey',
+          required: true
         },
         {
           title: '日期选择',
           type: 'date-picker',
-          key: 'datePickertKey'
+          key: 'datePickertKey',
+          required: true
         },
         {
           title: '颜色选择',
           type: 'color-picker',
-          key: 'colorPickertKey'
+          key: 'colorPickertKey',
+          required: true
         },
         {
           title: '日期选择',
           type: 'date-range',
-          key: 'dateRangeKey'
+          key: 'dateRangeKey',
+          required: true
         },
         {
           title: '日期选择',
           type: 'datetime-range',
-          key: 'datetimeRangeKey'
+          key: 'datetimeRangeKey',
+          required: true
+        },
+        {
+          type: 'submit',
+          onSubmit: (valid) => {
+            console.log(valid)
+          }
         }
       ]
     }
+  },
+  mounted () {
   }
 }
 </script>

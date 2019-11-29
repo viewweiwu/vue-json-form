@@ -13,8 +13,8 @@ install(fg)
  */
 export const initDefaultValue = function ({ fields, form }) {
   fields.forEach(field => {
-    if (isUndefined(form[field.key])) {
-      this.$set(form, field.key, fg.getDefaultValue(field.type))
+    if (!isUndefined(field.key) && isUndefined(form[field.key])) {
+      this.$set(form, field.key, fg.getDefaultValue(field.type, field))
     }
   })
 }
@@ -25,8 +25,8 @@ export const initDefaultValue = function ({ fields, form }) {
  * @param {Array} fields
  * @param {Object} form
  */
-export const renderForm = (h, { fields, form, readonly, emptyText, autoInitPlaceholder }) => {
-  return fg.renderForm(h, { fields, form, renderFields, readonly, emptyText, autoInitPlaceholder })
+export const renderForm = (h, { fields, form, readonly, emptyText, autoInitPlaceholder, context }) => {
+  return fg.renderForm(h, { fields, form, renderFields, readonly, emptyText, autoInitPlaceholder, context })
 }
 
 /**
@@ -35,7 +35,7 @@ export const renderForm = (h, { fields, form, readonly, emptyText, autoInitPlace
  * @param {Array} fields
  * @param {Object} form
  */
-const renderFields= (h, { fields, form }) => {
+const renderFields = (h, { fields, form }) => {
   let children = []
   fields.forEach(field => {
     if (field.type) {
