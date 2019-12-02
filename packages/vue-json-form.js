@@ -1,4 +1,3 @@
-<script>
 import { renderForm, initDefaultValue } from './field-renderer'
 
 export default {
@@ -42,5 +41,3 @@ export default {
     }
   }
 }
-
-</script>
