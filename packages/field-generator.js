@@ -1,4 +1,4 @@
-import { isFunc, isObj, copy, isUndefined } from './util'
+import { isFunc, isObj, copy, isUndefined, getLabelByOption } from './util'
 
 let FIELDS_MAP = {}
 let FORM_MAP = {}
@@ -72,7 +72,9 @@ class FieldGenerator {
    * @returns {Object} render function options object
    */
   getOptions (h, { field, form, props }) {
-    let defaultProps = FIELDS_MAP[field.type].defaultProps
+    let config = FIELDS_MAP[field.type]
+    let defaultProps = config.defaultProps
+    let defaultAttrs = config.defaultAttrs
     let totalProps = {
       ...defaultProps,
       ...field.props,
@@ -84,6 +86,8 @@ class FieldGenerator {
     totalProps.placeholder = placeholder
     let totalAttrs = {
       placeholder: totalProps.placeholder,
+      maxlength: totalProps.maxlength,
+      ...defaultAttrs,
       ...field.attrs
     }
     return {
@@ -94,7 +98,8 @@ class FieldGenerator {
         input (value) {
           form[field.key] = value
           if (isFunc(field.onChange)) {
-            field.onChange(value, { field, form })
+            let label = getLabelByOption(value, field.options)
+            field.onChange(value, { field, label, form })
           }
         }
       }

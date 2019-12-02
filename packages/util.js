@@ -86,3 +86,20 @@ export const formatDateRangeText = (date = [], formatter, emptyText) => {
     return formatter(date[0]) + ' ~ ' + formatter(date[1])
   }
 }
+
+/**
+ * get label by options
+ * @param {String|Number} value
+ * @param {Array<Object>} options
+ */
+export const getLabelByOption = (value, options) => {
+  if (!options || !options.length) {
+    return ''
+  } else {
+    let map = {}
+    options.forEach(option => {
+      map[option.value] = option.label
+    })
+    return map[value] || ''
+  }
+}
