@@ -1,8 +1,8 @@
 <template>
   <div>
     <el-button @click="readonly = !readonly">readonly</el-button>
-    <vue-json-form :fields="fields" :form="form" :readonly="readonly" />
-    <vue-json-form :fields="fields" :form="form" :readonly="readonly" />
+    <vue-json-form :fields="fields" :readonly="readonly" />
+    <!-- <vue-json-form :fields="fields" :form="form" :readonly="readonly" /> -->
   </div>
 </template>
 <script>
@@ -11,16 +11,17 @@ export default {
   data () {
     return {
       readonly: false,
-      form: {
-        name: '',
-        name2: ''
-      },
       fields: [
         {
           title: '姓名',
           type: 'input',
           key: 'name',
-          defaultValue: '3333',
+          required: true
+        },
+        {
+          title: '个性签名',
+          type: 'textarea',
+          key: 'desc',
           required: true
         },
         {
@@ -54,7 +55,10 @@ export default {
           required: true,
           options: [
             { label: '标签1', value: 0 }
-          ]
+          ],
+          onChange: (value, { label }) => {
+            console.log(value, label)
+          }
         },
         {
           title: '多选框',
@@ -135,7 +139,10 @@ export default {
           title: '日期选择',
           type: 'date-range',
           key: 'dateRangeKey',
-          required: true
+          required: true,
+          onChange: (value, { label }) => {
+            console.log(value, label)
+          }
         },
         {
           title: '日期选择',

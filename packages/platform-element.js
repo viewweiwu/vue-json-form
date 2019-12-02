@@ -75,7 +75,16 @@ export const install = (fg) => {
     type: 'input',
     defaultValue: '',
     defaultRequiredRule: { required: true, message: '请输入@title', trigger: 'blur' },
-    defaultProps: { placeholder: `请输入@title` }
+    defaultProps: { placeholder: `请输入@title`, maxlength: 20 }
+  })
+
+  // register textarea
+  fg.registerField({
+    tagName: 'el-input',
+    type: 'textarea',
+    defaultValue: '',
+    defaultRequiredRule: { required: true, message: '请输入@title', trigger: 'blur' },
+    defaultProps: { placeholder: `请输入@title`, type: 'textarea', maxlength: 256 }
   })
 
   // register input-number
