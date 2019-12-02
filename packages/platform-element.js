@@ -1,11 +1,10 @@
-import { formatTime, formatDate, formatFullDateTime, formatDateRangeText, isFunc } from './util'
+import { formatTime, formatDate, formatFullDateTime, formatDateRangeText, isFunc, isArray } from './util'
 
-const getRules = (fields, context, getConfigByFiledType) => {
-  if (context.rules) {
-    return context.rules
-  }
-  let rules = {}
+const loopRules = (fields, getConfigByFiledType, rules) => {
   fields.forEach(field => {
+    if (isArray(field)) {
+      return loopRules(field, getConfigByFiledType, rules)
+    }
     let rule = field.rule
     if (field.required) {
       rule = getRequiredRule(rule, field, getConfigByFiledType)
@@ -14,6 +13,15 @@ const getRules = (fields, context, getConfigByFiledType) => {
       rules[field.key] = rule
     }
   })
+  return rules
+}
+
+const getRules = (fields, context, getConfigByFiledType) => {
+  if (context.rules) {
+    return context.rules
+  }
+  let rules = {}
+  rules = loopRules(fields, getConfigByFiledType, {})
   context.rules = rules
   return context.rules
 }
@@ -28,6 +36,18 @@ const getRequiredRule = (rule, field, getConfigByFiledType) => {
 }
 
 export const install = (fg) => {
+  // register row
+  fg.registerGrid({
+    tagName: 'el-row',
+    type: 'row',
+    grid: 24
+  })
+  // register col
+  fg.registerGrid({
+    tagName: 'el-col',
+    type: 'col'
+  })
+
   // register form
   fg.registerForm({
     render (h, { fields, form, renderFields, context }) {

@@ -17,6 +17,14 @@ export const isFunc = (func) => {
 }
 
 /**
+ * is Array
+ * @param {Function} func
+ */
+export const isArray = (arr) => {
+  return Array.isArray(arr)
+}
+
+/**
  * is undefiend
  * @param {undefined} value
  */

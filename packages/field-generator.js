@@ -1,4 +1,4 @@
-import { isFunc, isObj, copy, isUndefined, getLabelByOption } from './util'
+import { isFunc, isArray, isObj, copy, isUndefined, getLabelByOption } from './util'
 
 let FIELDS_MAP = {}
 let FORM_MAP = {}
@@ -154,11 +154,31 @@ class FieldGenerator {
    * @returns {Function} form item render function
    */
   renderFormItem (h, { field, form }) {
+    if (isArray(field)) {
+      return this.renderFormItemByArray(h, { field, form })
+    }
     let context = this.context
     let target = FORM_MAP['form-item']
     if (target && target.render) {
       return target.render.call(this, h, { field, form, context })
     }
+  }
+  renderFormItemByArray (h, { field, form }) {
+    let rowConfig = FORM_MAP['row']
+    let colConfig = FORM_MAP['col']
+    let len = field.length
+    if (!field.length) {
+      return ''
+    }
+    let children = field.map(item => {
+      return h(
+        colConfig.tagName,
+        { props: { span: item.span || rowConfig.grid / len } },
+        [ this.renderFormItem(h, { field: item, form }) ]
+      )
+    })
+    let tag = h(rowConfig.tagName, children)
+    return tag
   }
   /**
    * render form
@@ -200,6 +220,13 @@ class FieldGenerator {
    */
   registerForm (options) {
     FORM_MAP['form'] = options
+  }
+  /**
+   * register grid
+   * @param {Object} options
+   */
+  registerGrid (options) {
+    FORM_MAP[options.type] = options
   }
 }
 

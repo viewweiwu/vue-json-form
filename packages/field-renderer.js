@@ -1,6 +1,6 @@
 import FieldGenerator from './field-generator'
 import { install } from './platform-element'
-import { isUndefined } from './util'
+import { isUndefined, isArray } from './util'
 
 const fg = new FieldGenerator()
 
@@ -13,7 +13,9 @@ install(fg)
  */
 export const initDefaultValue = function ({ fields, form }) {
   fields.forEach(field => {
-    if (!isUndefined(field.key) && isUndefined(form[field.key])) {
+    if (isArray(field)) {
+      initDefaultValue.call(this, { fields: field, form })
+    } else if (!isUndefined(field.key) && isUndefined(form[field.key])) {
       this.$set(form, field.key, fg.getDefaultValue(field.type, field))
     }
   })
@@ -38,7 +40,9 @@ export const renderForm = (h, { fields, form, readonly, emptyText, autoInitPlace
 const renderFields = (h, { fields, form }) => {
   let children = []
   fields.forEach(field => {
-    if (field.type) {
+    if (isArray(field)) {
+      children.push(fg.renderFormItemByArray(h, { field, form }))
+    } else if (field.type) {
       children.push(renderFormItem(h, { field, form }))
     }
   })

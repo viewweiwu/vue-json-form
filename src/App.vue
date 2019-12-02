@@ -12,6 +12,51 @@ export default {
     return {
       readonly: false,
       fields: [
+        [
+          [
+            {
+              title: '姓名4',
+              type: 'input',
+              key: 'nam4',
+              span: 24,
+              required: true
+            },
+            {
+              title: '姓名5',
+              type: 'textarea',
+              key: 'name5',
+              span: 24
+            }
+          ],
+          [
+            {
+              title: '姓名6',
+              type: 'input',
+              key: 'name6',
+              span: 8
+            },
+            {
+              title: '姓名7',
+              type: 'input',
+              key: 'name7',
+              span: 16
+            }
+          ]
+        ],
+        [
+          {
+            title: '姓名2',
+            type: 'input',
+            key: 'name2',
+            span: 8
+          },
+          {
+            title: '姓名3',
+            type: 'input',
+            key: 'name3',
+            span: 16
+          }
+        ],
         {
           title: '姓名',
           type: 'input',
