@@ -1,0 +1,5 @@
+.vue-json-form.el-form .el-date-editor.el-input,
+.vue-json-form.el-form .el-date-editor.el-input__inner,
+.vue-json-form.el-form .el-select {
+  width: 100%;
+}

@@ -7,6 +7,7 @@ class FieldGenerator {
   constructor () {
     this.readonly = false
     this.emptyText = '-'
+    this.methods = []
   }
   /**
    * get form item tag name
@@ -15,9 +16,9 @@ class FieldGenerator {
    */
   getTag (name) {
     let field = 'div'
-    let target = FIELDS_MAP[name]
+    let config = FIELDS_MAP[name]
     if (FIELDS_MAP[name]) {
-      field = target.tagName
+      field = config.tagName
     }
     return field
   }
@@ -26,17 +27,17 @@ class FieldGenerator {
    * @param {Function} h $createElement
    * @param {Object} field
    * @param {Object} form
-   * @param {Object} target field config
+   * @param {Object} config field config
    * @returns {Function} render function
    */
-  getRender (h, { field, form, target }) {
+  getRender (h, { field, form, config }) {
     let { readonly, context } = this
-    if (target) {
+    if (config) {
       // is readonly
       if (readonly || field.readonly) {
-        return this._getReadonly(h, { field, form, target, context })
-      } else if (isFunc(target.render)) {
-        return target.render.call(this, h, { field, form, readonly, context })
+        return this._getReadonly(h, { field, form, config, context })
+      } else if (isFunc(config.render)) {
+        return config.render.call(this, h, { field, form, readonly, context, config })
       }
     }
   }
@@ -45,17 +46,17 @@ class FieldGenerator {
    * @param {Function} h $createElement
    * @param {Object} field
    * @param {Object} form
-   * @param {Object} target field config
+   * @param {Object} config field config
    * @returns {Function} readonly render function
    */
-  _getReadonly (h, { field, form, target }) {
+  _getReadonly (h, { field, form, config }) {
     let { emptyText, context } = this
-    if (isFunc(target.renderReadonly)) {
-      return target.renderReadonly.call(this, h, { field, form, emptyText, context })
-    } else if (target.readonlyType === 'disabled') {
+    if (isFunc(config.renderReadonly)) {
+      return config.renderReadonly.call(this, h, { field, form, emptyText, context, config })
+    } else if (config.readonlyType === 'disabled') {
       let props = { disabled: true }
-      if (isFunc(target.render)) {
-        return target.render.call(this, h, { field, form, readonly: this.readonly, props, emptyText, context })
+      if (isFunc(config.render)) {
+        return config.render.call(this, h, { field, form, readonly: this.readonly, props, emptyText, context, config })
       } else {
         return h(this.getTag(field.type), this.getOptions(h, { field, form, props, context }))
       }
@@ -72,7 +73,7 @@ class FieldGenerator {
    * @returns {Object} render function options object
    */
   getOptions (h, { field, form, props }) {
-    let config = FIELDS_MAP[field.type]
+    let config = FIELDS_MAP[field.type] || {}
     let defaultProps = config.defaultProps
     let defaultAttrs = config.defaultAttrs
     let totalProps = {
@@ -111,19 +112,19 @@ class FieldGenerator {
    * @param {Object} field filed
    * @returns {Any} field default value
    */
-  getDefaultValue (key, field) {
+  getDefaultValue (key, field, valueKey = 'key') {
     if (!isUndefined(field.defaultValue)) {
       return field.defaultValue
     }
-    let target = FIELDS_MAP[key]
+    let config = FIELDS_MAP[key]
     let defaultValue = null
-    if (target) {
-      if (isUndefined(target.defaultValue)) {
+    if (config) {
+      if (isUndefined(config.defaultValue)) {
         return defaultValue
-      } else if (isObj(target.defaultValue)) {
-        return copy(target.defaultValue)
+      } else if (isObj(config.defaultValue)) {
+        return copy(config.defaultValue)
       } else {
-        return target.defaultValue
+        return config.defaultValue
       }
     } else {
       return defaultValue
@@ -139,7 +140,7 @@ class FieldGenerator {
    */
   renderField (h, { field, form }) {
     let context = this.context
-    let render = this.getRender(h, { field, form, context, target: FIELDS_MAP[field.type] })
+    let render = this.getRender(h, { field, form, context, config: FIELDS_MAP[field.type] })
     if (render) {
       return render
     } else {
@@ -153,17 +154,20 @@ class FieldGenerator {
    * @param {Object} form
    * @returns {Function} form item render function
    */
-  renderFormItem (h, { field, form }) {
+  renderFormItem (h, { field, form, showTitle }) {
     if (isArray(field)) {
-      return this.renderFormItemByArray(h, { field, form })
+      return this.renderFormItemByArray(h, { field, form, showTitle })
     }
     let context = this.context
-    let target = FORM_MAP['form-item']
-    if (target && target.render) {
-      return target.render.call(this, h, { field, form, context })
+    let config = FORM_MAP['form-item']
+    if (isFunc(field.render)) {
+      return field.render.call(this, h, { field, form, context, showTitle })
+    }
+    if (config && config.render) {
+      return config.render.call(this, h, { field, form, context, showTitle })
     }
   }
-  renderFormItemByArray (h, { field, form }) {
+  renderFormItemByArray (h, { field, form, showTitle }) {
     let rowConfig = FORM_MAP['row']
     let colConfig = FORM_MAP['col']
     let len = field.length
@@ -174,7 +178,7 @@ class FieldGenerator {
       return h(
         colConfig.tagName,
         { props: { span: item.span || rowConfig.grid / len } },
-        [ this.renderFormItem(h, { field: item, form }) ]
+        [ this.renderFormItem(h, { field: item, form, showTitle }) ]
       )
     })
     let tag = h(rowConfig.tagName, children)
@@ -195,9 +199,9 @@ class FieldGenerator {
     this.readonly = readonly
     this.emptyText = emptyText
     this.context = context
-    let target = FORM_MAP['form']
-    if (target && target.render) {
-      return target.render.call(this, h, { fields, form, renderFields, context })
+    let config = FORM_MAP['form']
+    if (config && config.render) {
+      return config.render.call(this, h, { fields, form, renderFields, context, config })
     }
   }
   /**
@@ -227,6 +231,19 @@ class FieldGenerator {
    */
   registerGrid (options) {
     FORM_MAP[options.type] = options
+  }
+  /**
+   * register method
+   * @param {Object} options
+   */
+  registerMethod (options) {
+    this.methods.push(options)
+  }
+  installMethods (context) {
+    this.methods.forEach(config => {
+      config.method({ context, config })
+    })
+    this.methods = []
   }
 }
 

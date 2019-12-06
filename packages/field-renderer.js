@@ -6,6 +6,10 @@ const fg = new FieldGenerator()
 
 install(fg)
 
+export const installMethods = function (context) {
+  fg.installMethods(context)
+}
+
 /**
  * init form default value
  * @param {Array} fields
@@ -17,6 +21,8 @@ export const initDefaultValue = function ({ fields, form }) {
       initDefaultValue.call(this, { fields: field, form })
     } else if (!isUndefined(field.key) && isUndefined(form[field.key])) {
       this.$set(form, field.key, fg.getDefaultValue(field.type, field))
+    } else if (field.type === 'group') {
+      initDefaultValue.call(this, { fields: field.groupList || [], form })
     }
   })
 }
@@ -27,8 +33,8 @@ export const initDefaultValue = function ({ fields, form }) {
  * @param {Array} fields
  * @param {Object} form
  */
-export const renderForm = (h, { fields, form, readonly, emptyText, autoInitPlaceholder, context }) => {
-  return fg.renderForm(h, { fields, form, renderFields, readonly, emptyText, autoInitPlaceholder, context })
+export const renderForm = (h, { fields, form, readonly, emptyText, context }) => {
+  return fg.renderForm(h, { fields, form, renderFields, readonly, emptyText, context })
 }
 
 /**

@@ -1,10 +1,9 @@
-<template>
-  <div>
-    <el-button @click="readonly = !readonly">readonly</el-button>
-    <vue-json-form :fields="fields" :readonly="readonly" />
-    <!-- <vue-json-form :fields="fields" :form="form" :readonly="readonly" /> -->
-  </div>
-</template>
+# element-ui 表单
+
+::: demo
+<el-button @click="readonly = !readonly">readonly</el-button>
+<vue-json-form :fields="fields" :readonly="readonly" />
+
 <script>
 export default {
   name: 'app',
@@ -12,92 +11,40 @@ export default {
     return {
       readonly: false,
       fields: [
-        [
-          [
-            {
-              title: '姓名4',
-              type: 'input',
-              key: 'nam4',
-              span: 24,
-              required: true
-            },
-            {
-              title: '姓名5',
-              type: 'textarea',
-              key: 'name5',
-              span: 24
-            }
-          ],
-          [
-            {
-              title: '姓名6',
-              type: 'input',
-              key: 'name6',
-              span: 8
-            },
-            {
-              title: '姓名7',
-              type: 'input',
-              key: 'name7',
-              span: 16
-            }
-          ]
-        ],
-        [
-          {
-            title: '姓名2',
-            type: 'input',
-            key: 'name2',
-            span: 8
-          },
-          {
-            title: '姓名3',
-            type: 'input',
-            key: 'name3',
-            span: 16
-          }
-        ],
         {
           title: '姓名',
           type: 'input',
-          key: 'name',
-          required: true
+          key: 'name'
         },
         {
           title: '个性签名',
           type: 'textarea',
-          key: 'desc',
-          required: true
+          key: 'desc'
         },
         {
           title: '身高',
           type: 'input-number',
-          key: 'age',
-          required: true
+          key: 'age'
         },
         {
           title: '是否成年',
           type: 'switch',
-          key: 'switchKey',
-          required: true
+          key: 'switchKey'
         },
         {
           title: '年龄',
           type: 'slider',
-          key: 'sliderKey',
-          required: true
+          key: 'sliderKey'
         },
         {
           title: '评分',
           type: 'rate',
-          key: 'rateKey',
-          required: true
+          key: 'rateKey'
         },
         {
           title: '选择',
           type: 'select',
           key: 'selectKey',
-          required: true,
           options: [
             { label: '标签1', value: 0 }
           ],
@@ -109,14 +56,12 @@ export default {
           title: '多选框',
           type: 'checkbox',
           key: 'checkboxKey',
-          label: '是否同意',
-          required: true
+          label: '是否同意'
         },
         {
           title: '多选框组',
           type: 'checkbox-group',
           key: 'checkboxGroupKey',
-          required: true,
           options: [
             { label: '标签1', value: 0 },
             { label: '标签2', value: 1 }
@@ -126,15 +71,13 @@ export default {
           title: '单选框',
           type: 'radio',
           key: 'radioKey',
-          label: '是否同意',
-          required: true
+          label: '是否同意'
         },
         {
 
           title: '单选框组',
           type: 'radio-group',
           key: 'radioGroupKey',
-          required: true,
           options: [
             { label: '标签1', value: 0 },
             { label: '标签2', value: 1 }
@@ -144,7 +87,6 @@ export default {
           title: '级连选择',
           type: 'cascader',
           key: 'cascaderKey',
-          required: true,
           options: [
             { label: '北京', value: 0 },
             {
@@ -159,32 +101,27 @@ export default {
         {
           title: '时间选择',
           type: 'time-select',
-          key: 'timeSelectKey',
-          required: true
+          key: 'timeSelectKey'
         },
         {
           title: '时间选择',
           type: 'time-picker',
-          key: 'timePickerKey',
-          required: true
+          key: 'timePickerKey'
         },
         {
           title: '日期选择',
           type: 'date-picker',
-          key: 'datePickertKey',
-          required: true
+          key: 'datePickertKey'
         },
         {
           title: '颜色选择',
           type: 'color-picker',
-          key: 'colorPickertKey',
-          required: true
+          key: 'colorPickertKey'
         },
         {
           title: '日期选择',
           type: 'date-range',
           key: 'dateRangeKey',
-          required: true,
           onChange: (value, { label }) => {
             console.log(value, label)
           }
@@ -192,8 +129,7 @@ export default {
         {
           title: '日期选择',
           type: 'datetime-range',
-          key: 'datetimeRangeKey',
-          required: true
+          key: 'datetimeRangeKey'
         },
         {
           type: 'submit',
@@ -210,14 +146,6 @@ export default {
 </script>
 
 <style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
 .form-readonly-text {
   min-height: 40px;
   line-height: 1em;
@@ -228,3 +156,20 @@ export default {
   box-sizing: border-box;
 }
 </style>
+:::
+
+## 基本参数
+| 参数 | 说明 | 类型 | 可选值 | 默认值 |
+| - | - | - | - | - |
+| fields | 配置列 | Array | <a href="#field">Field</a> | - |
+| form | 表单值 | Object | - | - |
+| readonly | 只读 | Boolean | - | false |
+| empty-text | 只读显示的文字 | String | - | '-' |
+
+## Field
+| 参数 | 说明 | 类型 | 可选值 | 默认值 |
+| - | - | - | - | - |
+| title | 标题 | String | - | - |
+| type | 表单类型 | String | 'input'...| - |
+| readonly | 只读 | Boolean | - | false |
+| empty-text | 只读显示的文字 | String | - | '-' |

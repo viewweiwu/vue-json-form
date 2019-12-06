@@ -2,6 +2,9 @@ import { formatTime, formatDate, formatFullDateTime, formatDateRangeText, isFunc
 
 const loopRules = (fields, getConfigByFiledType, rules) => {
   fields.forEach(field => {
+    if (field.type === 'group') {
+      return loopRules(field.groupList, getConfigByFiledType, rules)
+    }
     if (isArray(field)) {
       return loopRules(field, getConfigByFiledType, rules)
     }
@@ -60,6 +63,7 @@ export const install = (fg) => {
         class: classList,
         props: {
           'label-width': '120px',
+          ...context.$attrs,
           model: form,
           rules: getRules(fields, context, fg.getConfigByFiledType)
         }
@@ -72,7 +76,7 @@ export const install = (fg) => {
 
   // register form-item
   fg.registerFormItem({
-    render (h, { field, form }) {
+    render (h, { field, form, showTitle = true }) {
       let classList = []
       if (this.readonly || field.readonly) {
         classList.push('readonly')
@@ -80,12 +84,19 @@ export const install = (fg) => {
       let options = {
         class: classList,
         props: {
-          label: field.title,
-          prop: field.key
+          label: showTitle ? field.title : '',
+          prop: field.key,
+          required: field.required
         }
       }
-      let tag = this.renderField(h, { field, form })
-      return h('el-form-item', options, [ tag ])
+
+      let tag
+      if (field.type === 'group') {
+        tag = this.renderFormItemByArray(h, { field: field.groupList, form, showTitle: false })
+      } else {
+        tag = this.renderField(h, { field, form })
+      }
+      return h('el-form-item', options, [tag])
     }
   })
 
@@ -95,7 +106,7 @@ export const install = (fg) => {
     type: 'input',
     defaultValue: '',
     defaultRequiredRule: { required: true, message: '请输入@title', trigger: 'blur' },
-    defaultProps: { placeholder: `请输入@title`, maxlength: 20 }
+    defaultProps: { placeholder: `请输入@title`, maxlength: 20, clearable: true }
   })
 
   // register textarea
@@ -146,8 +157,8 @@ export const install = (fg) => {
     tagName: 'el-time-select',
     type: 'time-select',
     defaultValue: '',
-    defaultRequiredRule: { required: true, message: '请选择@title', trigger: 'change' },
-    defaultProps: { placeholder: `请选择@title` }
+    defaultRequiredRule: { required: true, type: 'date', message: '请选择@title', trigger: 'change' },
+    defaultProps: { placeholder: `请选择@title`, clearable: true }
   })
 
   // register time-picker
@@ -155,8 +166,8 @@ export const install = (fg) => {
     tagName: 'el-time-picker',
     type: 'time-picker',
     defaultValue: '',
-    defaultRequiredRule: { required: true, message: '请至少选择一个@title', trigger: 'change' },
-    defaultProps: { placeholder: `请选择@title` },
+    defaultRequiredRule: { required: true, type: 'date', message: '请至少选择一个@title', trigger: 'change' },
+    defaultProps: { placeholder: `请选择@title`, clearable: true },
     renderReadonly (h, { field, form, emptyText }) {
       return h('div', { class: 'form-readonly-text' }, formatTime(form[field.key]) || emptyText)
     }
@@ -167,8 +178,8 @@ export const install = (fg) => {
     tagName: 'el-date-picker',
     type: 'date-picker',
     defaultValue: '',
-    defaultRequiredRule: { required: true, message: '请选择@title', trigger: 'change' },
-    defaultProps: { placeholder: `请选择@title` },
+    defaultRequiredRule: { required: true, type: 'date', message: '请选择@title', trigger: 'change' },
+    defaultProps: { placeholder: `请选择@title`, clearable: true },
     renderReadonly (h, { field, form, emptyText }) {
       return h('div', { class: 'form-readonly-text' }, formatDate(form[field.key]) || emptyText)
     }
@@ -188,7 +199,7 @@ export const install = (fg) => {
     type: 'date-range',
     defaultValue: [],
     defaultRequiredRule: { required: true, message: '请选择@title', trigger: 'change' },
-    defaultProps: { type: 'daterange', 'start-placeholder': '开始日期', 'end-placeholder': '结束日期' },
+    defaultProps: { type: 'daterange', 'start-placeholder': '开始日期', 'end-placeholder': '结束日期', clearable: true },
     renderReadonly (h, { field, form, emptyText }) {
       return h('div', { class: 'form-readonly-text' }, formatDateRangeText(form[field.key], formatDate, emptyText))
     }
@@ -200,9 +211,59 @@ export const install = (fg) => {
     type: 'datetime-range',
     defaultValue: [],
     defaultRequiredRule: { required: true, message: '请选择@title', trigger: 'change' },
-    defaultProps: { type: 'datetimerange', 'start-placeholder': '开始日期', 'end-placeholder': '结束日期' },
+    defaultProps: { type: 'datetimerange', 'start-placeholder': '开始日期', 'end-placeholder': '结束日期', clearable: true },
     renderReadonly (h, { field, form, emptyText }) {
       return h('div', { class: 'form-readonly-text' }, formatDateRangeText(form[field.key], formatFullDateTime, emptyText))
+    }
+  })
+
+  // register datetime-picker
+  fg.registerField({
+    tagName: 'el-datetime-picker',
+    type: 'datetime-picker',
+    defaultValue: null,
+    defaultRequiredRule: { required: true, message: '请选择@title', trigger: 'change' },
+    defaultProps: { 'date-placeholder': '选择日期', 'time-placeholder': '选择时间', clearable: true },
+    render (h, { field, form, config }) {
+      let props = config.defaultProps
+      let dateOptions = {
+        props: {
+          placeholder: props['date-placeholder'],
+          clearable: props.clearable,
+          value: form[field.key]
+        },
+        on: {
+          input (value) {
+            form[field.key] = value
+            if (isFunc(field.onChange)) {
+              field.onChange(value, { field, form })
+            }
+          }
+        }
+      }
+      let timeOptions = {
+        props: {
+          placeholder: props['time-placeholder'],
+          clearable: props.clearable,
+          value: form[field.subKey]
+        },
+        on: {
+          input (value) {
+            form[field.subKey] = value
+            if (isFunc(field.onChange)) {
+              field.onChange(value, { field, form })
+            }
+          }
+        }
+      }
+      let datePicker = h('el-date-picker', dateOptions)
+      let divider = h('span', '-')
+      let timePicker = h('el-time-picker', timeOptions)
+      return h('el-row', [
+        h('el-col', { props: { span: 11 } }, [ datePicker ]),
+        h('el-col', { props: { span: 2 }, style: { 'text-align': 'center' } }, [ divider ]),
+        h('el-col', { props: { span: 11 } }, [ timePicker ])
+      ])
     }
   })
 
@@ -212,7 +273,7 @@ export const install = (fg) => {
     type: 'select',
     defaultValue: null,
     defaultRequiredRule: { required: true, message: '请选择@title', trigger: 'change' },
-    defaultProps: { placeholder: `请选择@title` },
+    defaultProps: { placeholder: `请选择@title`, clearable: true },
     render (h, { field, form }) {
       let options = field.options || []
       let optionsTag = options.map(option => {
@@ -250,17 +311,22 @@ export const install = (fg) => {
     tagName: 'el-checkbox-group',
     type: 'checkbox-group',
     defaultValue: [],
-    defaultRequiredRule: { required: true, message: '请选择@title', trigger: 'change' },
+    defaultRequiredRule: { required: true, type: 'array', message: '请选择@title', trigger: 'change' },
     readonlyType: 'disabled',
-    render (h, { field, form, props }) {
+    button: false,
+    render (h, { field, form, props, config }) {
       let options = field.options
       let optionsTag = options.map(option => {
-        return h('el-checkbox', {
-          props: {
-            label: option.value,
-            key: option.key
-          }
-        }, option.label)
+        return h(
+          (field.button || config.button) ? 'el-checkbox-button' : 'el-checkbox',
+          {
+            props: {
+              label: option.value,
+              key: option.key
+            }
+          },
+          option.label
+        )
       })
       return h(this.getTag('checkbox-group'), this.getOptions(h, { field, form, props }), optionsTag)
     }
@@ -285,15 +351,20 @@ export const install = (fg) => {
     defaultValue: [],
     defaultRequiredRule: { required: true, message: '请选择@title', trigger: 'change' },
     readonlyType: 'disabled',
-    render (h, { field, form, props }) {
+    button: false,
+    render (h, { field, form, props, config }) {
       let options = field.options
       let optionsTag = options.map(option => {
-        return h('el-radio', {
-          props: {
-            label: option.value,
-            key: option.key
-          }
-        }, option.label)
+        return h(
+          (field.button || config.button) ? 'el-radio-button' : 'el-radio',
+          {
+            props: {
+              label: option.value,
+              key: option.key
+            }
+          },
+          option.label
+        )
       })
       return h(this.getTag('radio-group'), this.getOptions(h, { field, form, props }), optionsTag)
     }
@@ -306,7 +377,7 @@ export const install = (fg) => {
     defaultValue: [],
     defaultRequiredRule: { required: true, message: '请选择@title', trigger: 'change' },
     readonlyType: 'disabled',
-    defaultProps: { placeholder: `请选择@title` },
+    defaultProps: { placeholder: `请选择@title`, clearable: true },
     render (h, { field, form, props }) {
       field.props
         ? field.props.options = field.options
@@ -327,7 +398,7 @@ export const install = (fg) => {
           click: () => {
             if (isFunc(field.onSubmit)) {
               context.$refs.form.validate(valid => {
-                field.onSubmit(valid)
+                field.onSubmit(context.form, valid)
               })
             }
           }
@@ -336,6 +407,15 @@ export const install = (fg) => {
       return h('div', [
         h('el-button', options, '提交')
       ])
+    }
+  })
+
+  fg.registerMethod({
+    name: 'validateField',
+    method ({ config, context }) {
+      context[config.name] = (args) => {
+        context.$refs.form[config.name].call(context, args)
+      }
     }
   })
 }

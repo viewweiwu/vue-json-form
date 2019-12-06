@@ -1,4 +1,4 @@
-import { renderForm, initDefaultValue } from './field-renderer'
+import { renderForm, initDefaultValue, installMethods } from './field-renderer'
 
 export default {
   name: 'vue-json-form',
@@ -17,16 +17,12 @@ export default {
     },
     emptyText: {
       type: String,
-      default: '-'
-    },
-    autoInitPlaceholder: {
-      type: Boolean,
-      default: true
+      default: 'hello'
     }
   },
   render (h) {
-    let { fields, form, readonly, emptyText, autoInitPlaceholder } = this
-    return renderForm(h, { fields, form, readonly, emptyText, autoInitPlaceholder, context: this })
+    let { fields, form, readonly, emptyText } = this
+    return renderForm(h, { fields, form, readonly, emptyText, context: this })
   },
   created () {
     this.init()
@@ -35,6 +31,7 @@ export default {
     init () {
       let { fields, form } = this
       initDefaultValue.call(this, { fields, form })
+      installMethods(this)
     },
     clear () {
       this.$refs.form.clearValidate()
