@@ -1,4 +1,4 @@
-import { formatTime, formatDate, formatFullDateTime, formatDateRangeText, isFunc, isArray } from './util'
+import { formatTime, formatDate, formatFullDateTime, formatDateRangeText, isFunc, isArray, copy } from '../../util'
 
 const loopRules = (fields, getConfigByFiledType, rules) => {
   fields.forEach(field => {
@@ -26,11 +26,12 @@ const getRules = (fields, context, getConfigByFiledType) => {
   let rules = {}
   rules = loopRules(fields, getConfigByFiledType, {})
   context.rules = rules
+  console.log(rules)
   return context.rules
 }
 
 const getRequiredRule = (rule, field, getConfigByFiledType) => {
-  let requiredRule = getConfigByFiledType(field.type).defaultRequiredRule
+  let requiredRule = copy(getConfigByFiledType(field.type).defaultRequiredRule)
   if (requiredRule) {
     requiredRule.message = requiredRule.message.replace(/@title/g, field.title)
   }
@@ -86,7 +87,7 @@ export const install = (fg) => {
         props: {
           label: showTitle ? field.title : '',
           prop: field.key,
-          required: field.required
+          required: field.type === 'group' ? field.required : null
         }
       }
 
@@ -214,56 +215,6 @@ export const install = (fg) => {
     defaultProps: { type: 'datetimerange', 'start-placeholder': '开始日期', 'end-placeholder': '结束日期', clearable: true },
     renderReadonly (h, { field, form, emptyText }) {
       return h('div', { class: 'form-readonly-text' }, formatDateRangeText(form[field.key], formatFullDateTime, emptyText))
-    }
-  })
-
-  // register datetime-picker
-  fg.registerField({
-    tagName: 'el-datetime-picker',
-    type: 'datetime-picker',
-    defaultValue: null,
-    defaultRequiredRule: { required: true, message: '请选择@title', trigger: 'change' },
-    defaultProps: { 'date-placeholder': '选择日期', 'time-placeholder': '选择时间', clearable: true },
-    render (h, { field, form, config }) {
-      let props = config.defaultProps
-      let dateOptions = {
-        props: {
-          placeholder: props['date-placeholder'],
-          clearable: props.clearable,
-          value: form[field.key]
-        },
-        on: {
-          input (value) {
-            form[field.key] = value
-            if (isFunc(field.onChange)) {
-              field.onChange(value, { field, form })
-            }
-          }
-        }
-      }
-      let timeOptions = {
-        props: {
-          placeholder: props['time-placeholder'],
-          clearable: props.clearable,
-          value: form[field.subKey]
-        },
-        on: {
-          input (value) {
-            form[field.subKey] = value
-            if (isFunc(field.onChange)) {
-              field.onChange(value, { field, form })
-            }
-          }
-        }
-      }
-      let datePicker = h('el-date-picker', dateOptions)
-      let divider = h('span', '-')
-      let timePicker = h('el-time-picker', timeOptions)
-      return h('el-row', [
-        h('el-col', { props: { span: 11 } }, [ datePicker ]),
-        h('el-col', { props: { span: 2 }, style: { 'text-align': 'center' } }, [ divider ]),
-        h('el-col', { props: { span: 11 } }, [ timePicker ])
-      ])
     }
   })
 
@@ -398,7 +349,7 @@ export const install = (fg) => {
           click: () => {
             if (isFunc(field.onSubmit)) {
               context.$refs.form.validate(valid => {
-                field.onSubmit(context.form, valid)
+                field.onSubmit(copy(context.form), valid)
               })
             }
           }

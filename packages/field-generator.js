@@ -1,13 +1,15 @@
 import { isFunc, isArray, isObj, copy, isUndefined, getLabelByOption } from './util'
 
-let FIELDS_MAP = {}
-let FORM_MAP = {}
+export let FIELDS_MAP = {}
+export let FORM_MAP = {}
 
 class FieldGenerator {
   constructor () {
     this.readonly = false
     this.emptyText = '-'
     this.methods = []
+    this.FIELDS_MAP = FIELDS_MAP
+    this.FORM_MAP = FORM_MAP
   }
   /**
    * get form item tag name
@@ -161,10 +163,10 @@ class FieldGenerator {
     let context = this.context
     let config = FORM_MAP['form-item']
     if (isFunc(field.render)) {
-      return field.render.call(this, h, { field, form, context, showTitle })
+      return field.render.call(this, h, { field, form, context, config, showTitle })
     }
     if (config && config.render) {
-      return config.render.call(this, h, { field, form, context, showTitle })
+      return config.render.call(this, h, { field, form, context, config, showTitle })
     }
   }
   renderFormItemByArray (h, { field, form, showTitle }) {
@@ -174,11 +176,13 @@ class FieldGenerator {
     if (!field.length) {
       return ''
     }
+    let config = FORM_MAP['form-item']
+    let context = this.context
     let children = field.map(item => {
       return h(
         colConfig.tagName,
         { props: { span: item.span || rowConfig.grid / len } },
-        [ this.renderFormItem(h, { field: item, form, showTitle }) ]
+        [ this.renderFormItem(h, { field: item, form, context, config, showTitle }) ]
       )
     })
     let tag = h(rowConfig.tagName, children)

@@ -1,4 +1,5 @@
 import { renderForm, initDefaultValue, installMethods } from './field-renderer'
+import { copy } from './util'
 
 export default {
   name: 'vue-json-form',
@@ -17,7 +18,12 @@ export default {
     },
     emptyText: {
       type: String,
-      default: 'hello'
+      default: '-'
+    }
+  },
+  data () {
+    return {
+      copyForm: {}
     }
   },
   render (h) {
@@ -32,6 +38,7 @@ export default {
       let { fields, form } = this
       initDefaultValue.call(this, { fields, form })
       installMethods(this)
+      this.copyForm = copy(form)
     },
     clear () {
       this.$refs.form.clearValidate()

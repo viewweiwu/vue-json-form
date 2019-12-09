@@ -1,5 +1,6 @@
 import FieldGenerator from './field-generator'
-import { install } from './platform-element'
+import { install } from './platform/element-ui/platform-element'
+// import { install } from './platform/ant-design/platform-antd'
 import { isUndefined, isArray } from './util'
 
 const fg = new FieldGenerator()
@@ -33,8 +34,8 @@ export const initDefaultValue = function ({ fields, form }) {
  * @param {Array} fields
  * @param {Object} form
  */
-export const renderForm = (h, { fields, form, readonly, emptyText, context }) => {
-  return fg.renderForm(h, { fields, form, renderFields, readonly, emptyText, context })
+export const renderForm = (h, { fields, form, context }) => {
+  return fg.renderForm(h, { fields, form, renderFields, context })
 }
 
 /**
